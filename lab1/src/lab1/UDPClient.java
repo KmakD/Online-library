@@ -21,12 +21,11 @@ public class UDPClient {
 			int serverPort = 9876;
 			DatagramSocket aSocket = new DatagramSocket ();
 			aSocket.setSoTimeout(3000);
-			byte [] msg = new byte [1024];
 			String mesage = "";
 			Scanner scan = new Scanner(System.in);
 			mesage = scan.nextLine();
 			System.out.println(" Sent : " + mesage);
-			msg = mesage.getBytes();
+			byte [] msg = mesage.getBytes();
 			
 			InetAddress aHost = InetAddress.getByName ("localhost");
 			DatagramPacket request = new DatagramPacket (msg , msg.length , aHost , serverPort );
