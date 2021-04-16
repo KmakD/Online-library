@@ -3,6 +3,7 @@ package lab1;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,8 @@ public class UDPServer {
 	public static void main ( String [] args ) {
 		try {
 		List<String> users_list = new ArrayList<String>();
+		List<InetAddress> users_ipaddress = new ArrayList<InetAddress>();
+		List<Integer> users_port = new ArrayList<Integer>();
 		DatagramSocket aSocket = new DatagramSocket (9876);
 		byte [] buffer = new byte [1024];
 		while ( true ) {		
@@ -30,17 +33,25 @@ public class UDPServer {
 			String msg = new String(message, 0, lastgood);
 		
 			String reply_msg = "";
+			String send_msg = "";
 			
+			//addd user
 			if(msg.charAt(0) == '+') {
 				String add_user = msg.substring(1);
 				users_list.add(add_user);
+				users_ipaddress.add(request.getAddress());
+				users_port.add(request.getPort());
 				reply_msg = msg + " Added";
 			}
+			//remove user
 			if(msg.charAt(0) == '-') {
 				String dlt_user = msg.substring(1);
 				users_list.remove(dlt_user);
+				users_ipaddress.remove(request.getAddress());
+				users_port.remove(request.getPort());
 				reply_msg = msg + " Removed";
 			}
+			//send list of users
 			if(msg.charAt(0) == '?') {
 				reply_msg = "?";
 					
@@ -62,10 +73,34 @@ public class UDPServer {
 					}
 				}
 			}
+			//sending messages
+			if(msg.charAt(0) == '!') {
+				String recv = msg.substring(1);
+				String user = "";
+				String msgg = "";
+				for(int i = 0; i<recv.length();i++) {
+					if(recv.charAt(i) == '|') {
+						msgg = msg.substring(i+1);
+						break;
+					}
+					user = user + recv.charAt(i);
+				}
+				int index = users_list.indexOf(user);
+				InetAddress IpAddress = users_ipaddress.get(index);
+				int Port = users_port.get(index);
+				reply_msg = msg + " Sended to: " + user+Port+IpAddress; 
+				send_msg = user + " sends: " + msgg;
+				
+				byte [] replyym = send_msg.getBytes();
+				
+				DatagramPacket replym = new DatagramPacket ( replyym ,
+				replyym.length , IpAddress , Port);
+				aSocket.send ( replym );
+			}
 			byte [] replyy = reply_msg.getBytes();
 			
 			DatagramPacket reply = new DatagramPacket ( replyy ,
-			replyy.length , request.getAddress () , request.getPort ());
+			replyy.length , request.getAddress() , request.getPort ());
 			aSocket.send ( reply );
 			
 			for(int i = 0; i<message.length; i++) {
