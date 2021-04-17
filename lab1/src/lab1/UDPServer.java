@@ -17,6 +17,7 @@ public class UDPServer {
 		List<String> users_list = new ArrayList<String>();
 		List<InetAddress> users_ipaddress = new ArrayList<InetAddress>();
 		List<String> users_port = new ArrayList<String>();
+		List<String> users_find = new ArrayList<String>();
 		DatagramSocket aSocket = new DatagramSocket (9876);
 		byte [] buffer = new byte [1024];
 		while ( true ) {		
@@ -46,9 +47,10 @@ public class UDPServer {
 						break;
 					}
 				}
+				users_find.add(Integer.toString(request.getPort()));
 				users_list.add(add_user);
 				users_ipaddress.add(request.getAddress());
-				reply_msg = msg + " Added";
+				reply_msg = "+" + add_user + " Added";
 			}
 			//remove user
 			if(msg.charAt(0) == '-') {
@@ -87,7 +89,7 @@ public class UDPServer {
 				String msgg = "";
 				for(int i = 0; i<recv.length();i++) {
 					if(recv.charAt(i) == '|') {
-						msgg = msg.substring(i+1);
+						msgg = msg.substring(i+2);
 						break;
 					}
 					user = user + recv.charAt(i);
@@ -95,8 +97,10 @@ public class UDPServer {
 				int index = users_list.indexOf(user);
 				InetAddress IpAddress = users_ipaddress.get(index);
 				int Port = Integer.parseInt(users_port.get(index));
-				reply_msg = msg + " Sended to: " + user; 
-				send_msg = user + " sends: " + msgg;
+				reply_msg = msg + " Sent to: " + user; 
+				String prt = Integer.toString(request.getPort());
+				String usr = users_list.get(users_find.indexOf(prt));
+				send_msg = " Message: " + msgg + " from: " + usr;
 				
 				byte [] replyym = send_msg.getBytes();
 				

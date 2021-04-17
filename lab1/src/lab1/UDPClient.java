@@ -15,15 +15,16 @@ import java.net.UnknownHostException;
 
 
 public class UDPClient {
+	
 	static int Portt = 0;
-	public static int al(int a) {
+	public static int sendPort(int a) {
 		Portt = a;
 		return Portt;
 	}
+	
 	public static void main ( String [] args ) {
 		
 		int port = 0;
-		int getPort = 0;
 
 		Thread chat = new Thread(()->{
 			int port2 = 0;
@@ -33,15 +34,8 @@ public class UDPClient {
 					DatagramSocket apSocket = new DatagramSocket (port2);
 					port2 = apSocket.getLocalPort();
 					
-					al(port2);
-					/*int serverPort = 9876;
-					
-					String mesage = " ";
-					byte [] msg = mesage.getBytes();
-					InetAddress aHost = InetAddress.getByName ("localhost");
-					DatagramPacket request = new DatagramPacket (msg , msg.length , aHost , serverPort );
-					apSocket.send ( request );*/
-					
+					sendPort(port2);
+
 					byte [] buffer = new byte [1024];
 					DatagramPacket reply = new DatagramPacket ( buffer , buffer.length );	
 					apSocket.setSoTimeout(3000);
@@ -66,11 +60,9 @@ public class UDPClient {
 		
 		try {
 		while(true) {	
-			int i = 0;
 			int serverPort = 9876;
 			DatagramSocket aSocket = new DatagramSocket (port);
 			port = aSocket.getLocalPort();
-			System.out.println(port);
 			aSocket.setSoTimeout(3000);
 			String mesage = "";
 			Scanner scan = new Scanner(System.in);
@@ -78,7 +70,7 @@ public class UDPClient {
 			mesage = scan.nextLine();
 			System.out.println(" Sent : " + mesage);
 			
-			if(i>1 || mesage.charAt(0)!='+') {	
+			if(mesage.charAt(0)!='+') {	
 				byte [] msg = mesage.getBytes();
 				InetAddress aHost = InetAddress.getByName ("localhost");
 				DatagramPacket request = new DatagramPacket (msg , msg.length , aHost , serverPort );
@@ -88,7 +80,6 @@ public class UDPClient {
 				DatagramPacket reply = new DatagramPacket ( buffer , buffer.length );
 				aSocket.receive ( reply );
 				System.out.println (" Reply : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
-				i++;
 			}else if(mesage.charAt(0)=='+'){
 				mesage = mesage + "|" + Portt; 
 				byte [] msg = mesage.getBytes();
@@ -100,7 +91,6 @@ public class UDPClient {
 				DatagramPacket reply = new DatagramPacket ( buffer , buffer.length );
 				aSocket.receive ( reply );
 				System.out.println (" Reply : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
-				i++;
 			}
 			
 			aSocket.close();
