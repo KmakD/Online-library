@@ -7,29 +7,51 @@ import java.util.logging.Logger;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
+
+
 public class UDPClient {
+	static int Portt = 0;
+	public static int al(int a) {
+		Portt = a;
+		return Portt;
+	}
 	public static void main ( String [] args ) {
 		
+		int port = 0;
+		int getPort = 0;
+
 		Thread chat = new Thread(()->{
+			int port2 = 0;
 			try {
 				while(true) {
-					DatagramSocket apSocket = new DatagramSocket ();
+					
+					DatagramSocket apSocket = new DatagramSocket (port2);
+					port2 = apSocket.getLocalPort();
+					
+					al(port2);
+					/*int serverPort = 9876;
+					
+					String mesage = " ";
+					byte [] msg = mesage.getBytes();
+					InetAddress aHost = InetAddress.getByName ("localhost");
+					DatagramPacket request = new DatagramPacket (msg , msg.length , aHost , serverPort );
+					apSocket.send ( request );*/
 					
 					byte [] buffer = new byte [1024];
 					DatagramPacket reply = new DatagramPacket ( buffer , buffer.length );	
-					apSocket.setSoTimeout(0);
-					/*try {
+					apSocket.setSoTimeout(3000);
+					try {
 						apSocket.receive ( reply );
-						System.out.println (" Reply : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
-					}catch(SocketTimeoutException e) {}*/
-					apSocket.receive ( reply );
-					System.out.println (" Reply : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
-				
+						System.out.println (" Incoming : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
+					}catch(SocketTimeoutException e) {}
 					apSocket.close();
+					//Thread.sleep(4000);
+					
 				}
 
 			} catch ( SocketException ex) {
@@ -40,21 +62,24 @@ public class UDPClient {
 			Logger . getLogger ( UDPClient . class . getName ()). log ( Level . SEVERE , null , ex );
 			}
 		});
-		
 		chat.start();
 		
 		try {
-		while(true) {			
+		while(true) {	
+			int i = 0;
 			int serverPort = 9876;
-			DatagramSocket aSocket = new DatagramSocket ();
+			DatagramSocket aSocket = new DatagramSocket (port);
+			port = aSocket.getLocalPort();
+			System.out.println(port);
 			aSocket.setSoTimeout(3000);
 			String mesage = "";
 			Scanner scan = new Scanner(System.in);
-			if(scan.hasNext()) {
-				mesage = scan.nextLine();
-				System.out.println(" Sent : " + mesage);
+
+			mesage = scan.nextLine();
+			System.out.println(" Sent : " + mesage);
+			
+			if(i>1 || mesage.charAt(0)!='+') {	
 				byte [] msg = mesage.getBytes();
-				
 				InetAddress aHost = InetAddress.getByName ("localhost");
 				DatagramPacket request = new DatagramPacket (msg , msg.length , aHost , serverPort );
 				aSocket.send ( request );
@@ -63,8 +88,23 @@ public class UDPClient {
 				DatagramPacket reply = new DatagramPacket ( buffer , buffer.length );
 				aSocket.receive ( reply );
 				System.out.println (" Reply : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
+				i++;
+			}else if(mesage.charAt(0)=='+'){
+				mesage = mesage + "|" + Portt; 
+				byte [] msg = mesage.getBytes();
+				InetAddress aHost = InetAddress.getByName ("localhost");
+				DatagramPacket request = new DatagramPacket (msg , msg.length , aHost , serverPort );
+				aSocket.send ( request );
+				
+				byte [] buffer = new byte [1024];
+				DatagramPacket reply = new DatagramPacket ( buffer , buffer.length );
+				aSocket.receive ( reply );
+				System.out.println (" Reply : " + new String ( reply.getData(), reply.getOffset(), reply.getLength()));
+				i++;
 			}
-			aSocket.close ();
+			
+			aSocket.close();
+
 		}
 		} catch ( SocketException ex) {
 		Logger . getLogger ( UDPClient . class . getName ()). log ( Level . SEVERE , null , ex );
