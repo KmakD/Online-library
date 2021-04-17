@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -88,7 +89,7 @@ public class UDPServer {
 				String user = "";
 				String msgg = "";
 				for(int i = 0; i<recv.length();i++) {
-					if(recv.charAt(i) == '|') {
+					if(recv.charAt(i) == ' ') {
 						msgg = msg.substring(i+2);
 						break;
 					}
@@ -100,7 +101,8 @@ public class UDPServer {
 				reply_msg = msg + " Sent to: " + user; 
 				String prt = Integer.toString(request.getPort());
 				String usr = users_list.get(users_find.indexOf(prt));
-				send_msg = " Message: " + msgg + " from: " + usr;
+				Date nowDate = new Date();
+				send_msg = " Message: \"" + msgg + "\" from: " + usr + " date: " + nowDate;
 				
 				byte [] replyym = send_msg.getBytes();
 				
