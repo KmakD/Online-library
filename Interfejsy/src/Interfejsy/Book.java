@@ -1,5 +1,7 @@
 package Interfejsy;
 
-public class Book {
+import java.io.Serializable;
+
+public class Book implements Serializable {
 
 }
