@@ -21,7 +21,7 @@ public class libServer{
 		try {
 			reg = LocateRegistry.createRegistry(1099);
 			servant = new libServant();
-			reg.rebind("sever", servant);
+			reg.rebind("libServer", servant);
 			System.out.println("Server Ready");
 		}catch(RemoteException e) {
 			e.printStackTrace();
