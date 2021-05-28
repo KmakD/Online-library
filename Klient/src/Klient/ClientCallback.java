@@ -10,5 +10,9 @@ public class ClientCallback extends UnicastRemoteObject implements ClientInterfa
 	public ClientCallback() throws RemoteException{
 		super();
 	}
+
+	public void inform(String msg) throws RemoteException {
+		System.out.println(msg);
+	}
 	
 }
